@@ -7,3 +7,5 @@ standard-app-packages
 preserve-inputs
 underscore
 jquery
+accounts-ui
+accounts-facebook
