@@ -180,6 +180,15 @@ function start () {
         canvasToResize.width = window.innerWidth;
       };
     }
+
+    function debugTestImage() {
+      var testImg = new Image;
+      testImg.onload = function() {
+        var context = PD.Canvas.getCanvasById("UIMap").context;
+        context.drawImage(testImg, 0, 0);
+      };
+      testImg.src = "http://adnanthetraveller.com/wp-content/uploads/2013/10/corgi-3.jpg";
+    }
   //\\***Function Section Ends Here***
 
   //\\***Run Section Starts Here***
@@ -187,6 +196,7 @@ function start () {
     initializeAnimation();
     initializeCanvas();
     setupUI();
+    debugTestImage();
   //\\***Run Section Ends Here***
 
 } // End of start
