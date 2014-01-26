@@ -98,6 +98,25 @@ function start () {
         // And finally we return the canvas with its context to the caller.
         return newCanvasWithContext;
       } // Canvas.create Ends Here
+      
+      // This function allows us to grab a canvas/context pair by
+      // passing the Id of the canvas.
+      Canvas.getCanvasById = function(canvasId) {
+        var match;
+        _.each(PD.Canvas.Data.canvases, function(canvasContextPair){
+           if (canvasContextPair.canvas.id === canvasId) {
+             match = canvasContextPair;
+           }
+        });
+        // Failure case
+        if (match === undefined){
+          console.log("The requested canvas was not found.");
+        }
+        // Success case
+        else {
+          return match;
+        }
+      }
 
       // Finally we append our fleshed out Canvas subclass to the application's
       // PD namespace.
@@ -117,19 +136,68 @@ function start () {
       // Finally we append Draw to the PD namespace.
       PD.Draw = Draw;
     }
+    
+    function setupUI() {
+      // This function is responsible for creating and attaching
+      // the various parts of the game's UI.  For example things
+      // such as the canvas that maps are displayed on.
+
+      // We're going to need a few values from the browser
+      // to set up the UI, so we're grabbing them first.
+      var windowHeight = window.innerHeight;
+      var windowWidth = window.innerWidth;
+
+      // We need to remove the small padding that is applied to
+      // the window by default.
+      document.body.setAttribute("style",
+        "margin : 0;"
+        + "padding : 0;"
+        + "overflow: hidden;"
+      );
+
+      // We create a div named gameView to hold all of the UI 
+      // elements and attach it to the body.
+      var divUI = document.createElement('div');
+      divUI.id = "UI";
+      document.body.appendChild(divUI);
+
+      // We use PD.Canvas.create() to create a canvas that will
+      // display the background map.  This map should be sized
+      // to the size of the entire browser view, and resize itself
+      // to maintain that property.
+      // We create the canvas.
+      var canvasUIMap = PD.Canvas.create({
+        "id" : "UIMap",
+        "height" : windowHeight,
+        "width" : windowWidth
+      }, divUI, "2d");
+      // And we attach an event listener to the window to fire whenever
+      // the window resizes, causing this element to resize with it.
+      window.onresize = function() {
+        // First we grab the canvas using PD.Canvas.getCanvasById
+        var canvasToResize = PD.Canvas.getCanvasById("UIMap").canvas;
+        canvasToResize.height = window.innerHeight;
+        canvasToResize.width = window.innerWidth;
+      };
+    }
   //\\***Function Section Ends Here***
 
   //\\***Run Section Starts Here***
     initializePDNamespace();
     initializeAnimation();
     initializeCanvas();
+    setupUI();
   //\\***Run Section Ends Here***
 
 } // End of start
 
 // This is the main initialization sequence which runs our
-// start and update functions.
+// start function.
 
 //\\*** Main Initialization Sequence Starts Here***
-  start();
+  // Everything is enclosed in Meteor.startup so that
+  // noting will run until everything is ready.
+  Meteor.startup(function(){
+    start();
+  });
 //\\*** Main Initialization Sequence Ends Here***
